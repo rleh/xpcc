@@ -13,7 +13,7 @@
 
 %% if target is stm32f4
 	%% set streams = range(0,8)
-%% elif target is stm32f3
+%% elif target is stm32f3 or target is stm32f0
 	%% if id == 1
 		%% set streams = range(1,7)
 	%% elif id == 2
@@ -28,7 +28,7 @@ xpcc::stm32::Dma{{ id }}::enable()
 	RCC->AHB1ENR  |= RCC_AHB1ENR_DMA{{ id }}EN;
 	RCC->AHB1RSTR |=  RCC_AHB1RSTR_DMA{{ id }}RST;
 	RCC->AHB1RSTR &= ~RCC_AHB1RSTR_DMA{{ id }}RST;
-%% elif target is stm32f3
+%% elif target is stm32f3 or target is stm32f0
 	RCC->AHBENR  |= RCC_AHBENR_DMA{{ id }}EN;
 %% endif
 }
@@ -38,7 +38,7 @@ xpcc::stm32::Dma{{ id }}::disable()
 {
 %% if target is stm32f4
 	RCC->AHB1ENR &= ~RCC_AHB1ENR_DMA{{ id }}EN;
-%% elif target is stm32f3
+%% elif target is stm32f3 or target is stm32f0
 	RCC->AHBENR &= ~RCC_AHBENR_DMA{{ id }}EN;
 %% endif
 
@@ -54,7 +54,7 @@ xpcc::stm32::Dma{{ id }}::disable()
 	%% set per = stream ~ "->PAR"
 	%% set length = stream ~ "->NDTR"
 	%% set prefix = "DMA_SxCR"
-%% elif target is stm32f3
+%% elif target is stm32f3 or target is stm32f0
 	%% set channel = "DMA" ~ id ~ "_Channel" ~ stream_id
 	%% set reg = channel ~ "->CCR"
 	%% set mem = channel ~ "->CMAR"
@@ -204,7 +204,7 @@ xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::configure(
 	uint16_t sample_length, Priority priority, CircularMode circular
 %% if target is stm32f4
 	, FlowControl flow)
-%% elif target is stm32f3
+%% elif target is stm32f3 or target is stm32f0
 	)
 %% endif
 {
