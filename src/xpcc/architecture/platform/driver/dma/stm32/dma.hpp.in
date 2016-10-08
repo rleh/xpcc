@@ -19,7 +19,7 @@
  * @defgroup	{{target.string}}_dma DMA
  */
 
-%% if target is stm32f4
+%% if target is stm32f4 or target is stm32f7
 	%% set streams = range(0,8)
 %% elif target is stm32f0 or target is stm32f1 or target is stm32f3
 	%% if id == 1
@@ -64,7 +64,7 @@ public:
 		static inline void
 		setMemorySource(uint{{type}}_t* address,
 			MemoryIncrementMode inc = MemoryIncrementMode::Increment
-		%% if target is stm32f4
+		%% if target is stm32f4 or target is stm32f7
 			, MemoryBurstTransfer transfer = MemoryBurstTransfer::Single);
 		%% elif target is stm32f0 or target is stm32f1 or target is stm32f3
 			);
@@ -74,7 +74,7 @@ public:
 		static inline void
 		setPeripheralSource(uint{{type}}_t* address,
 			PeripheralIncrementMode inc = PeripheralIncrementMode::Fixed
-		%% if target is stm32f4
+		%% if target is stm32f4 or target is stm32f7
 			, PeripheralBurstTransfer transfer = PeripheralBurstTransfer::Single);
 		%% elif target is stm32f0 or target is stm32f1 or target is stm32f3
 			);
@@ -86,7 +86,7 @@ public:
 		static inline void
 		setMemoryDestination(uint{{type}}_t* address,
 			MemoryIncrementMode inc = MemoryIncrementMode::Increment
-		%% if target is stm32f4
+		%% if target is stm32f4 or target is stm32f7
 			, MemoryBurstTransfer transfer = MemoryBurstTransfer::Single);
 		%% elif target is stm32f0 or target is stm32f1 or target is stm32f3
 			);
@@ -96,7 +96,7 @@ public:
 		static inline void
 		setPeripheralDestination(uint{{type}}_t* address,
 			PeripheralIncrementMode inc = PeripheralIncrementMode::Fixed
-		%% if target is stm32f4
+		%% if target is stm32f4 or target is stm32f7
 			, PeripheralBurstTransfer transfer = PeripheralBurstTransfer::Single);
 		%% elif target is stm32f0 or target is stm32f1 or target is stm32f3
 			);
@@ -109,13 +109,13 @@ public:
 		/// will disable the stream
 		static inline void
 		configure(
-		%% if target is stm32f4
+		%% if target is stm32f4 or target is stm32f7
 			Channel channel,
 		%% endif
 			uint16_t sample_length,
 			Priority priority = Priority::Medium,
 			CircularMode circular = CircularMode::Disabled
-		%% if target is stm32f4
+		%% if target is stm32f4 or target is stm32f7
 			, FlowControl flow = FlowControl::Dma);
 		%% elif target is stm32f0 or target is stm32f1 or target is stm32f3
 			);

@@ -14,7 +14,7 @@
 #include "../../../type_ids.hpp"
 #include "../../../device.hpp"
 
-%% if target is stm32f4
+%% if target is stm32f4 or target is stm32f7
 	%% set reg_prefix = "DMA_SxCR"
 %% elif target is stm32f0 or target is stm32f1 or target is stm32f3
 	%% set reg_prefix = "DMA_CCR"
@@ -36,7 +36,7 @@ class DmaBase
 {
 public:
 	// Enums
-%% if target is stm32f4
+%% if target is stm32f4 or target is stm32f7
 	enum class
 	Channel : uint32_t
 	{
@@ -133,7 +133,7 @@ public:
 	enum class
 	DataTransferDirection : uint32_t
 	{
-%% if target is stm32f4
+%% if target is stm32f4 or target is stm32f7
 		/// Source: DMA_SxPAR; Sink: DMA_SxM0AR
 		PeripheralToMemory 	= 0,
 		/// Source: DMA_SxM0AR; Sink: DMA_SxPAR
@@ -151,7 +151,7 @@ public:
 	};
 
 protected:
-%% if target is stm32f4
+%% if target is stm32f4 or target is stm32f7
 	static constexpr uint32_t memoryMask =
 			DMA_SxCR_MBURST_1 | DMA_SxCR_MBURST_0 |	// MemoryBurstTransfer
 			DMA_SxCR_MSIZE_0  | DMA_SxCR_MSIZE_1  |	// MemoryDataSize
