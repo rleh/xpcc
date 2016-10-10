@@ -290,3 +290,10 @@ xpcc::stm32::{{ name }}::acknowledgeInterruptFlags(InterruptFlag flags)
 	(void) flags;	// avoid compiler warning
 %% endif
 }
+
+void
+xpcc::stm32::{{ name }}::setDmaMode(DmaMode dmaMode)
+{
+	{{ peripheral }}->CR3 &= ({{ peripheral }}->CR3 & ~static_cast<uint32_t>(DmaMode::All))
+													| static_cast<uint32_t>(dmaMode);
+}

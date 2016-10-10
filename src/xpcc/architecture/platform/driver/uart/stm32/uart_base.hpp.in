@@ -122,6 +122,16 @@ public:
 		Enabled  = USART_CR2_CLKEN,
 	};
 
+	enum class
+	DmaMode : uint32_t
+	{
+		Disabled 		= 0,
+		Receive 		= USART_CR3_DMAR,
+		Transmit	 	= USART_CR3_DMAT,
+		Bidirectional 	= USART_CR3_DMAR | USART_CR3_DMAT,
+		All				= Bidirectional,
+	};
+
 };
 
 /// @cond
