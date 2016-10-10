@@ -187,3 +187,10 @@ xpcc::stm32::SpiHal{{ id }}::acknowledgeInterruptFlag(InterruptFlag /*flags*/)
 	// TODO: implement; see STM32F3 reference manual p. 736
 	// SPI{{ id }}->SR =  static_cast<InterruptFlag>(flags);
 }
+
+void inline
+xpcc::stm32::SpiHal{{ id }}::setDmaMode(DmaMode dmaMode)
+{
+	SPI{{ id }}->CR2 = (SPI{{ id }}->CR2 & ~static_cast<uint32_t>(DmaMode::All))
+										 | static_cast<uint32_t>(dmaMode);
+}

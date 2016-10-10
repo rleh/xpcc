@@ -131,6 +131,12 @@ public:
 	 */
 	static void
 	acknowledgeInterruptFlag(InterruptFlag flags);
+
+	/**
+	 * This enables only the dma request generation.
+	 */
+	static void
+	setDmaMode(DmaMode dmaMode);
 };
 
 } // namespace stm32

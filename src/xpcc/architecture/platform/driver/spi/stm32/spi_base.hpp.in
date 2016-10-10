@@ -127,6 +127,16 @@ public:
 		Div256 	= SPI_CR1_BR_2 | SPI_CR1_BR_1 | SPI_CR1_BR_0,
 	};
 
+	enum class
+	DmaMode : uint32_t
+	{
+		Disabled 		= 0,
+		Receive 		= SPI_CR2_RXDMAEN,
+		Transmit	 	= SPI_CR2_TXDMAEN,
+		Bidirectional 	= SPI_CR2_RXDMAEN | SPI_CR2_TXDMAEN,
+		All				= Bidirectional,
+	};
+
 };
 
 /// @cond
