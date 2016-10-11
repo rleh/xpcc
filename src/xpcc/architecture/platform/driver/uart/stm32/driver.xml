@@ -15,5 +15,8 @@
 		<parameter name="flow" type="bool">false</parameter>
 		<parameter name="tx_buffer" type="int" min="1" max="65534">250</parameter>
 		<parameter name="rx_buffer" type="int" min="1" max="65534">16</parameter>
+		<!-- DmaUart -->
+		<template instances="1,2,3,4,5,6,7,8" out="uart_dma_{{id}}.hpp">uart_dma.hpp.in</template>
+		<template instances="1,2,3,4,5,6,7,8" out="uart_dma_{{id}}_impl.hpp">uart_dma_impl.hpp.in</template>
 	</driver>
 </rca>

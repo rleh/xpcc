@@ -122,6 +122,17 @@ public:
 		%% endif
 
 		static inline void
+		configure(
+			uint16_t sample_length,
+			Priority priority = Priority::Medium,
+			CircularMode circular = CircularMode::Disabled);
+
+		%% if target is stm32f4 or target is stm32f7
+		static inline void
+		setChannel(Channel channel);
+		%% endif
+
+		static inline void
 		start();
 
 		static inline bool

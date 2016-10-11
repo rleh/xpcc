@@ -297,3 +297,29 @@ xpcc::stm32::{{ name }}::setDmaMode(DmaMode dmaMode)
 	{{ peripheral }}->CR3 &= ({{ peripheral }}->CR3 & ~static_cast<uint32_t>(DmaMode::All))
 													| static_cast<uint32_t>(dmaMode);
 }
+
+xpcc::stm32::{{ name }}::DmaMode
+xpcc::stm32::{{ name }}::getDmaMode()
+{
+	return static_cast<DmaMode>({{ peripheral }}->CR3 & static_cast<uint32_t>(DmaMode::All));
+}
+
+volatile uint32_t*
+xpcc::stm32::{{ name }}::getTransmitDataRegister()
+{
+%% if target is stm32f0 or target is stm32f3 or target is stm32f7
+	return &({{ peripheral }}->TDR);
+%% else
+	return &({{ peripheral }}->DR);
+%% endif
+}
+
+volatile uint32_t*
+xpcc::stm32::{{ name }}::getReceiveDataRegister()
+{
+%% if target is stm32f0 or target is stm32f3 or target is stm32f7
+	return &({{ peripheral }}->RDR);
+%% else
+	return &({{ peripheral }}->DR);
+%% endif
+}

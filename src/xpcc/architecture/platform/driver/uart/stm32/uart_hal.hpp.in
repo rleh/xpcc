@@ -180,6 +180,18 @@ public:
 	 */
 	static inline void
 	setDmaMode(DmaMode dmaMode);
+	
+	/// get the current DmaMode
+	static inline DmaMode
+	getDmaMode();
+	
+	/// Address of DR / TDR register (e.g. for DMA)
+	static inline volatile uint32_t*
+	getTransmitDataRegister();
+	
+	/// Address of DR / RDR register (e.g. for DMA)
+	static inline volatile uint32_t*
+	getReceiveDataRegister();
 };
 
 }	// namespace stm32

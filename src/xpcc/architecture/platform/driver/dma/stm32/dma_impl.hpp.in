@@ -220,6 +220,23 @@ xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::configure(
 }
 
 void
+xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::configure(
+	uint16_t sample_length, Priority priority, CircularMode circular)
+{
+	{{ reg }} = ({{ reg }} & ~configmask) | static_cast<uint32_t>(priority)
+										  | static_cast<uint32_t>(circular);
+	{{ length }} = sample_length;
+}
+
+%% if target is stm32f4 or target is stm32f7
+void
+xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::setChannel(Channel channel)
+{
+	{{ reg }} = ({{ reg }} & ~static_cast<uint32_t>(Channel::All)) | static_cast<uint32_t>(channel);
+}
+%% endif
+
+void
 xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::start()
 {
 %% if target is stm32f4 or target is stm32f7

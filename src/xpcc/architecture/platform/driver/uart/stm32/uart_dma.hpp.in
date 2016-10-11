@@ -1,0 +1,111 @@
+// coding: utf-8
+/* Copyright (c) 2016, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+%% if id in [1, 2, 3, 6] or target is stm32f0
+%%	set uart = "Usart"
+%% elif id in [4, 5, 7, 8]
+%%	set uart = "Uart"
+%% endif
+%% set hal = uart ~ "Hal" ~ id
+
+#ifndef XPCC_STM32_UART_DMA_{{ id }}_HPP
+#define XPCC_STM32_UART_DMA_{{ id }}_HPP
+
+#include <xpcc/architecture/interface/uart.hpp>
+#include "../../../type_ids.hpp"
+#include "uart_base.hpp"
+#include "uart_baudrate.hpp"
+#include "uart_hal_{{ id }}.hpp"
+
+namespace xpcc
+{
+
+namespace stm32
+{
+
+/**
+ * Universal asynchronous receiver transmitter ({{ uart | upper ~ id }}) with DMA
+ *
+ * @author		Raphael Lehmann
+ * @ingroup		{{target.string}}_uart
+ */
+template< class DmaStream >
+class Dma{{ uart ~ id }} : public UartBase, public ::xpcc::Uart
+{
+public:
+	/// TypeId used to connect GPIO pins to this peripheral's rx.
+	static const TypeId::Uart{{ id }}Rx Rx;
+	/// TypeId used to connect GPIO pins to this peripheral's tx.
+	static const TypeId::Uart{{ id }}Tx Tx;
+
+public:
+template< 	class SystemClock, uint32_t baudrate,
+		uint16_t tolerance = xpcc::Tolerance::OnePercent >
+	static void ALWAYS_INLINE
+	initialize(Parity parity = Parity::Disabled)
+	{
+%% if target is not stm32f1
+		constexpr UartBase::OversamplingMode oversample =
+				UartBaudrate::getOversamplingMode(SystemClock::{{ uart ~ id }}, baudrate);
+%% endif
+
+		{{ hal }}::initializeWithBrr(
+				UartBaudrate::getBrr<SystemClock::{{ uart ~ id }}, baudrate, tolerance>(),
+%% if target is stm32f1
+				parity);
+%% else
+				parity,
+				oversample);
+%% endif
+		{{ hal }}::setTransmitterEnable(true);
+		{{ hal }}::setReceiverEnable(true);
+
+		DmaStream::stop();
+		while(!DmaStream::isFinished()) {
+			// TODO: bad idea
+		}
+	}
+
+	static void
+	writeBlocking(uint8_t data);
+
+	static void
+	writeBlocking(const uint8_t *data, std::size_t length);
+
+	static void
+	flushWriteBuffer();
+
+	static bool
+	write(uint8_t data);
+
+	static std::size_t
+	write(const uint8_t *data, std::size_t length);
+
+	static bool
+	isWriteFinished();
+
+	static std::size_t
+	discardTransmitBuffer();
+
+	static bool
+	read(uint8_t &data);
+
+	static std::size_t
+	read(uint8_t *buffer, std::size_t length);
+
+	static std::size_t
+	discardReceiveBuffer();
+};
+
+}	// namespace stm32
+
+}	// namespace xpcc
+
+#include "uart_dma_{{ id }}_impl.hpp"
+
+#endif // XPCC_STM32_UART_DMA_{{ id }}_HPP

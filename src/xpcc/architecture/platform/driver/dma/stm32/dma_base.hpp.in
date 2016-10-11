@@ -48,6 +48,7 @@ public:
 		Channel5 = DMA_SxCR_CHSEL_2 | DMA_SxCR_CHSEL_0,
 		Channel6 = DMA_SxCR_CHSEL_2 | DMA_SxCR_CHSEL_1,
 		Channel7 = DMA_SxCR_CHSEL_2 | DMA_SxCR_CHSEL_1 | DMA_SxCR_CHSEL_0,
+		All      = Channel7,
 	};
 
 	enum class

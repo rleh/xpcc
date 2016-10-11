@@ -1,0 +1,135 @@
+// coding: utf-8
+/* Copyright (c) 2016, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+#ifndef XPCC_STM32_UART_DMA_{{ id }}_HPP
+#	error 	"Don't include this file directly, use 'uart_dma_{{ id }}.hpp' instead!"
+#endif
+
+%% if id in [1, 2, 3, 6] or target is stm32f0
+%%	set uart = "Usart"
+%% elif id in [4, 5, 7, 8]
+%%	set uart = "Uart"
+%% endif
+%#
+%% set name = "Dma" ~ uart ~ id
+%% set hal = uart ~ "Hal" ~ id
+
+#include "../../../device.hpp"
+#include "uart_hal_{{ id }}.hpp"
+#include "uart_dma_{{ id }}.hpp"
+#include "../../dma/stm32/dma_base.hpp"
+
+template < class DmaStream >
+void
+xpcc::stm32::{{ name }}< DmaStream >::writeBlocking(uint8_t data)
+{
+	while(!{{ hal }}::isTransmitRegisterEmpty());
+	{{ hal }}::write(data);
+}
+
+template < class DmaStream >
+void
+xpcc::stm32::{{ name }}< DmaStream >::writeBlocking(const uint8_t *data, std::size_t length)
+{
+	while (length-- != 0) {
+		writeBlocking(*data++);
+	}
+}
+
+template < class DmaStream >
+void
+xpcc::stm32::{{ name }}< DmaStream >::flushWriteBuffer()
+{
+	return;
+}
+
+template < class DmaStream >
+bool
+xpcc::stm32::{{ name }}< DmaStream >::write(uint8_t data)
+{
+	if(!DmaStream::isFinished()){
+		return false;
+	}
+	if({{ hal }}::isTransmitRegisterEmpty()) {
+		{{ hal }}::write(data);
+		return true;
+	} else {
+		return false;
+	}
+}
+
+template < class DmaStream >
+std::size_t
+xpcc::stm32::{{ name }}< DmaStream >::write(const uint8_t *data, std::size_t length)
+{
+	/*if(!isWriteFinished()){
+		return 0;
+	}*/
+	{{ hal }}::setTransmitterEnable(false);
+	{{ hal }}::setDmaMode(static_cast<DmaMode>(
+		static_cast<uint32_t>({{ hal }}::getDmaMode())
+		| static_cast<uint32_t>(DmaMode::Transmit)
+	));
+	DmaStream::stop();
+	uint32_t lDebugDmaCr = DMA1_Stream6->CR & DMA_SxCR_EN;
+	DmaStream::configure(static_cast<uint16_t>(length), DmaBase::Priority::VeryHigh);
+	DmaStream::setChannel(DmaBase::Channel::Channel4);
+	DmaStream::setPeripheralDestination(reinterpret_cast<uint8_t*>(const_cast<uint32_t*>({{ hal }}::getTransmitDataRegister())), DmaBase::PeripheralIncrementMode::Fixed);
+	DmaStream::setMemorySource(const_cast<uint8_t*>(data), DmaBase::MemoryIncrementMode::Increment);
+	DmaStream::start();
+	
+	{{ hal }}::setTransmitterEnable(true);
+	
+	return length;
+}
+
+template < class DmaStream >
+bool
+xpcc::stm32::{{ name }}< DmaStream >::isWriteFinished()
+{
+	return {{ hal }}::isTransmitRegisterEmpty() && DmaStream::isFinished();
+}
+
+template < class DmaStream >
+std::size_t
+xpcc::stm32::{{ name }}< DmaStream >::discardTransmitBuffer()
+{
+	return 0;
+}
+
+template < class DmaStream >
+bool
+xpcc::stm32::{{ name }}< DmaStream >::read(uint8_t &data)
+{
+	if({{ hal }}::isReceiveRegisterNotEmpty()) {
+		{{ hal }}::read(data);
+		return true;
+	} else {
+		return false;
+	}
+}
+
+template < class DmaStream >
+std::size_t
+xpcc::stm32::{{ name }}< DmaStream >::read(uint8_t *data, std::size_t length)
+{
+	(void)length; // avoid compiler warning
+	if(read(*data)) {
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+template < class DmaStream >
+std::size_t
+xpcc::stm32::{{ name }}< DmaStream >::discardReceiveBuffer()
+{
+	return 0;
+}
+
