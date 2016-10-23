@@ -101,6 +101,12 @@ def platform_tools_find_device_file(env):
 				if id.name in names and id.pin_id in pins and id.size_id in sizes:
 					device_file = os.path.join(xml_path, file)
 					break
+
+	elif id.platform == 'zynq':
+		for file in os.listdir(xml_path):
+			if id.name in file:
+				device_file = os.path.join(xml_path, file)
+				break
 	else:
 		temp_device = device
 		while temp_device != None and len(temp_device) > 0:
@@ -360,6 +366,9 @@ def generate(env, **kw):
 	def test_core(target, core, starts_with=False):
 		return test_item(target, 'core', core, starts_with)
 	env.AddTemplateJinja2Test('core', test_core)
+	def test_speed_grade(target, speed_grade):
+		return test_item(target, 'speed-grade', speed_grade)
+	env.AddTemplateJinja2Test('speed_grade', test_speed_grade)
 
 	# Core Tests
 	def test_cortex(target):
@@ -386,6 +395,9 @@ def generate(env, **kw):
 	def test_cortex_m7fd(target):
 		return test_core(target, 'cortex-m7fd')
 	env.AddTemplateJinja2Test('cortex_m7fd', test_cortex_m7fd)
+	def test_cortex_a9(target):
+		return test_core(target, 'cortex-a9')
+	env.AddTemplateJinja2Test('cortex_a9', test_cortex_a9)
 
 	# Platform Tests
 	def test_is_stm32(target):
@@ -397,6 +409,9 @@ def generate(env, **kw):
 	def test_is_avr(target):
 		return test_platform(target, 'avr')
 	env.AddTemplateJinja2Test('avr', test_is_avr)
+	def test_is_zynq(target):
+		return test_platform(target, 'zynq')
+	env.AddTemplateJinja2Test('zynq', test_is_zynq)
 
 	# STM32 Family Test
 	def test_is_stm32f0(target):
@@ -417,6 +432,11 @@ def generate(env, **kw):
 	def test_is_stm32f7(target):
 		return test_platform(target, 'stm32') and test_family(target, 'f7')
 	env.AddTemplateJinja2Test('stm32f7', test_is_stm32f7)
+
+	# Zynq Family Test
+	def test_is_zynq_xc7z(target):
+		return test_platform(target, 'zynq') and test_family(target, 'xc7z')
+	env.AddTemplateJinja2Test('zynq-xc7z', test_is_zynq_xc7z)
 
 # -----------------------------------------------------------------------------
 def exists(env):

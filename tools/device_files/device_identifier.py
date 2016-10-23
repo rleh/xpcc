@@ -94,6 +94,17 @@ class DeviceIdentifier:
 			if len(string) >= 9:
 				self.valid = True
 
+		elif string.startswith('zynq'):
+			if len(string) != 21:
+				self.valid = True
+			else:
+				self.platform = "zynq"
+				self.family = string[5:9]
+				self.name = string[5:12]
+				self.pin_id = string[13:19]
+				self.speed_grade = string[20]
+				self.valid = True
+
 		# AVR platform with AT90, ATtiny, ATmega and ATxmega family
 		elif string.startswith('at'):
 			self.platform = "avr"
