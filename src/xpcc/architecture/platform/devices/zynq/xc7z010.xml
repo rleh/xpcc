@@ -1,0 +1,106 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE rca SYSTEM "../devicefile.dtd">
+<rca version="1.0">
+  <device platform="zynq" family="xc7z0" name="xc7z010" pin_id="clg225|clg400|clg484|clg485|cl400|cl484" speed_grade="1|2|3">
+    <naming-schema>{{ platform }}-{{ name }}-{{ pin_id }}-{{ speed_grade }}</naming-schema>
+    <core>cortex-a9</core>
+    <pin-count device-pin-id="clg225">84</pin-count>
+    <pin-count device-pin-id="clg400">128</pin-count>
+    <pin-count device-pin-id="clg484">128</pin-count>
+    <pin-count device-pin-id="clg485">128</pin-count>
+    <pin-count device-pin-id="cl400">128</pin-count>
+    <pin-count device-pin-id="cl484">128</pin-count>
+    <header>include/xparameters_ps.h</header>
+	<!-- <define>SOMETHING</define> -->
+    <driver type="core" name="cortex-a9">
+      <memory access="rx" start="0xFC000000" name="flash-qspi" size="16M"/>
+      <memory ocm-mapping="high" access="rwx" start="0xFFFC0000" name="ocm" size="512"/>
+      <memory ocm-mapping="low" access="rwx" start="0x00000000" name="ocm" size="512"/>
+      <memory access="rwx" start="0x00000000" name="ddr" size="512M"/>
+      <memory access="rwx" start="0x00040000" name="ddr" size="512M"/>
+      <vector position="0" name="WWDG"/>
+    </driver>
+	<!-- <driver type="uart" name="zynq" instances="1,2"/> -->
+    <driver type="gpio" name="zynq">
+      <gpio bank="0" count="32"/>
+      <gpio bank="1" count="22"/>
+      <gpio bank="2" count="32"/>
+      <gpio bank="3" count="32"/>
+	  <!-- <gpio port="A" id="0">
+        <af id="1" peripheral="Timer2" name="Channel1"/>
+        <af id="1" peripheral="Timer2" name="ExternalTrigger" type="in"/>
+        <af id="7" peripheral="Uart2" name="Cts" type="in"/>
+        <af peripheral="Adc1" name="Channel1" type="analog"/>
+	  </gpio> -->
+    </driver>
+    <driver type="mio">
+      <bank id="0" count="16"/>
+      <bank pin-count="84" id="1" count="16"/>
+	  <bank pin-count="128" id="1" count="38"/>
+      <pin id="0" bank="0">
+        <mode mux="0000000" name="Gpio0"/>
+      </pin>
+      <pin id="1" bank="0">
+        <mode mux="0000000" name="Gpio1"/>
+      </pin>
+      <pin id="2" bank="0">
+        <mode mux="0000000" name="Gpio2"/>
+      </pin>
+      <pin id="3" bank="0">
+        <mode mux="0000000" name="Gpio3"/>
+      </pin>
+      <pin id="4" bank="0">
+        <mode mux="0000000" name="Gpio4"/>
+      </pin>
+      <pin id="5" bank="0">
+        <mode mux="0000000" name="Gpio5"/>
+      </pin>
+      <pin id="6" bank="0">
+        <mode mux="0000000" name="Gpio6"/>
+      </pin>
+      <pin id="7" bank="0">
+        <mode mux="0000000" name="Gpio7"/>
+      </pin>
+      <pin id="8" bank="0">
+        <mode mux="0000000" name="Gpio8"/>
+        <mode mux="1110000" name="Uart1Tx"/>
+      </pin>
+      <pin id="9" bank="0">
+        <mode mux="0000000" name="Gpio9"/>
+        <mode mux="1110000" name="Uart1Rx"/>
+      </pin>
+      <pin id="10" bank="0">
+        <mode mux="0000000" name="Gpio10"/>
+        <mode mux="1110000" name="Uart0Rx"/>
+      </pin>
+      <pin id="11" bank="0">
+        <mode mux="0000000" name="Gpio11"/>
+        <mode mux="1110000" name="Uart0Tx"/>
+      </pin>
+      <pin id="12" bank="0">
+        <mode mux="0000000" name="Gpio12"/>
+        <mode mux="1110000" name="Uart1Tx"/>
+      </pin>
+      <pin id="13" bank="0">
+        <mode mux="0000000" name="Gpio13"/>
+        <mode mux="1110000" name="Uart1Rx"/>
+      </pin>
+      <pin id="14" bank="0">
+        <mode mux="0000000" name="Gpio14"/>
+        <mode mux="1110000" name="Uart0Rx"/>
+      </pin>
+      <pin id="15" bank="0">
+        <mode mux="0000000" name="Gpio15"/>
+        <mode mux="1110000" name="Uart0Tx"/>
+      </pin>
+      <!-- TODO other modes and MIO pins 16..53 -->
+      <!--
+      Useful data sources: 
+      * Vivado/2016.2/data/PS/7series/data/zynqconfig/mio/mio_preset.xml
+      * Vivado/2016.2/data/PS/7series/data/zynqconfig/2.0/ps7regs/sw_param.xml
+      * Vivado/2016.2/data/PS/7series/data/zynqconfig/1.0/ps7regs/sw_param.xml
+      -->
+    </driver>
+
+  </device>
+</rca>
