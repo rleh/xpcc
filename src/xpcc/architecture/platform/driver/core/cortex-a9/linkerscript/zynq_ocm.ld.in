@@ -1,0 +1,133 @@
+/*
+ *                           LINKER  SCRIPT
+ *
+ * 
+ * The Linker Script defines how the code and data emitted by the GNU C compiler
+ * and assembler are  to be loaded into memory (code goes into FLASH, variables
+ * go into RAM).
+ *
+ * Any symbols defined in the Linker Script are automatically global and
+ * available to the rest of the program.
+ *
+ * Zynq physical OCM (on chip memory) layout:
+ *  256KB OCM, divided into 4 blocks, each 64KB.
+ *  Each block can be mapped high or low
+ *  Block 0 to 2 are mapped low after startup (BootROM), block 3 is mapped high
+ * 
+ *   +- Block -+-------- Address high -------+-------- Address low --------+- Size -+
+ *   |    0    | (0xFFFC 0000 - 0xFFFC FFFF) |  0x0000 0000 - 0x0000 FFFF  |  64KB  |
+ *   |    1    | (0xFFFD 0000 - 0xFFFC FFFF) |  0x0001 0000 - 0x0001 FFFF  |  64KB  |
+ *   |    2    | (0xFFFE 0000 - 0xFFFD FFFF) |  0x0002 0000 - 0x0002 FFFF  |  64KB  |
+ *   |    3    |  0xFFFF 0000 - 0xFFFF FFFF  | (0x0003 0000 - 0x0003 FFFF) |  64KB  |
+ *   +---------+-----------------------------+-----------------------------+--------+
+ *     Non-default adress mappings are parenthetical
+ */
+
+MEMORY
+{
+	OCM0 (rwx) : ORIGIN = 0x00000000, LENGTH = 64k
+	OCM1 (rwx) : ORIGIN = 0x00010000, LENGTH = 64k
+	OCM2 (rwx) : ORIGIN = 0x00020000, LENGTH = 64k
+	OCM3 (rwx) : ORIGIN = 0xFFFF0000, LENGTH = 64k /* not used now */
+}
+
+PROVIDE(__ram_start = ORIGIN(OCM0));
+PROVIDE(__ram_end   = ORIGIN(OCM2) + LENGTH(OCM2));
+
+
+/* Example for Zynq with OCM only:
+ *
+ *                          MEMORY MAP (RAM)
+ * 
+ *      High mapped OCM3 block is not used.
+ * 
+ *      +-------> |---------------------------------| 0x0002 FFFF <---- __process_stack_top, __stack_end
+ *      |         |       Process Stack (psp)       |
+ *      |         |       (grows downwards)         |
+ *      |         |               |                 |
+ *      |         |               v                 |
+ *   .stack       |---------------------------------| <------- __main_stack_top
+ *      |         |        Main Stack (msp)         |
+ *      |         |       (grows downwards)         |
+ *      |         |               |                 |
+ *      |         |               v                 |
+ *      +-------> |---------------------------------| <------- __stack_start, __heap_end
+ *      |         |                                 |
+ *      |         |               ^                 |
+ *   .heap        |               |                 |
+ *      |         |            Heap Area            |
+ *      |         |         (grows upwards)         | <------- __heap_start
+ *      +-------> |---------------------------------| <------- __noinit_end
+ *      |         |                                 |
+ *   .noinit      |     Global data not cleared     |
+ *      |         |           after reset           | <------- __noinit_start
+ *      +-------> |---------------------------------| <------- __bss_end
+ *      |         |                                 |
+ *    .bss        |     uninitialized variables     |
+ *      |         |                                 | <------- __bss_start
+ *      +-------> |---------------------------------| <------- __data_end
+ *      |         |                                 |
+ *      |         |                                 |
+ *    .data       |     initialized variables       |
+ *      |         |     (contains .fastdata)        |
+ *      |         |                                 | <------- __data_start
+ *      +-------> |---------------------------------| <------- __text_end
+ *      |         |                                 |
+ *    .text       |              Code               |
+ *      |         |                                 | 0x0000 00xx <---- __text_start
+ *      +-------> |---------------------------------| <------- __vector_table_end 
+ *      |         |                                 |
+ *   .vectors     |          Vector table           |
+ *      |         |                                 |
+ *      +-------> |---------------------------------| 0x0000 0000 <---- __ram_start, __vector_table_start
+ */
+
+OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
+OUTPUT_ARCH(arm)
+
+/* First executable instruction in an output file */
+ENTRY(Reset_Handler)
+
+/* force linker to include the syscalls from libxpcc.a */
+EXTERN(_sbrk_r)
+EXTERN(_init)
+
+SECTIONS
+{
+	. = 0x00000000;
+	vector_table_start = .;
+	.startup . : { startup.o(.text) }
+	vector_table_end = .;
+
+	. = ALIGN(16);  /* 128 bit alignment for OCM */
+	text_start = .;
+	.text : { *(.text) }
+	text_end = .;
+
+	. = ALIGN(16);
+	data_start = .;
+	.data : { *(.data) }
+	data_end = .;
+
+	. = ALIGN(16);
+	bss_start = .;
+	.bss : { *(.bss COMMON) }
+	bss_end = .;
+
+	. = ALIGN(16);
+	noinit_start = .;
+	.noinit : { *(.noinit) }
+	noinit_end = .;
+
+
+	. = ALIGN(16);
+	heap_start = .;
+	heap_end = 0x0002CFFF;
+
+	stack_start = 0x0002D000;
+	/* 8kB (0x2000) of main stack memory */
+	main_stack_top = 0x0002EFFF;
+	/* 4kB (0x1000) of process stack memory */
+	process_stack_top = 0x0002FFFF;
+	stack_end = process_stack_top;
+}

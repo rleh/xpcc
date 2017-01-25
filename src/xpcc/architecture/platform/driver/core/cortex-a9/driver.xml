@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE rca SYSTEM "../../xml/driver.dtd">
+<rca version="1.0">
+	<driver type="core" name="cortex-a9">
+		<parameter name="allocator" type="enum" values="newlib;block_allocator;tlsf">
+			newlib
+		</parameter>
+		<parameter name="enable_gpio" type="bool">true</parameter>
+		<parameter name="vector_table_in_ram" type="bool">false</parameter>
+		<parameter name="main_stack_size" type="int" min="512" max="8192">3040</parameter>
+
+
+		<parameter name="enable_hardfault_handler_log" type="enum" values="false;basic;true">false</parameter>
+		<parameter name="hardfault_handler_uart" type="int" min="1" max="8">1</parameter>
+
+		<parameter name="enable_hardfault_handler_led" type="bool">false</parameter>
+		<parameter name="hardfault_handler_led_port" type="enum" values="A;B;C;D;E;F;G;H;I;J;K">A</parameter>
+		<parameter name="hardfault_handler_led_pin" type="int" min="0" max="15">0</parameter>
+
+		<parameter name="free_rtos_support" type="bool">false</parameter>
+		<parameter name="free_rtos_frequency" type="int" min="1000" max="10000">1000</parameter>
+
+		<parameter name="linkerscript_memory" type="string"></parameter>
+		<parameter name="linkerscript_sections" type="string"></parameter>
+		<parameter name="linkerscript_table_zero_extern" type="string"></parameter>
+		<parameter name="linkerscript_table_copy_extern" type="string"></parameter>
+		<parameter name="linkerscript_table_heap_extern" type="string"></parameter>
+
+		<!-- zynq -->
+		<template device-platform="zynq" out="linkerscript.ld">linkerscript/zynq.ld.in</template>
+
+		<!-- dealing with newlib -->
+		<static>syscalls.c</static>
+		<!-- startup script -->
+		<template>startup.c.in</template>
+		<static>default_handler.sx</static>
+
+		<!-- everything to do with accurate busy-waiting -->
+		<template>delay.cpp.in</template>
+
+	</driver>
+</rca>
